@@ -1,0 +1,38 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto17
+    commands:
+      - echo "Java version:"
+      - java -version
+
+  pre_build:
+    commands:
+      - echo "Preparing Gradle build..."
+      - chmod +x ./gradlew
+
+  build:
+    commands:
+      - echo "Building Spring Boot application..."
+      - ./gradlew clean build -x test
+      - echo "Build completed successfully"
+
+  post_build:
+    commands:
+      - echo "Packaging application..."
+      - mv build/libs/*.jar build/libs/bookms.jar
+      - ls -la build/libs/
+
+artifacts:
+  files:
+    - 'build/libs/bookms.jar'
+    - 'appspec-backend.yml'
+    - 'deploy-scripts/**/*'
+  name: backend-build-$(date +%Y%m%d-%H%M%S)
+
+cache:
+  paths:
+    - '/root/.gradle/caches/**/*'
+    - '/root/.gradle/wrapper/**/*'
